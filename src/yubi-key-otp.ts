@@ -1,0 +1,210 @@
+// Copyright (c) 2019-2022, Brandon Lehmann <brandonlehmann@gmail.com>
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+import fetch from 'cross-fetch';
+import AbortController from 'abort-controller';
+import { createHmac } from 'crypto';
+import { v4 } from 'uuid';
+
+export interface YubiKeySigningParametersOptional {
+    timestamp?: string;
+    sl?: string;
+    timeout?: number;
+}
+
+interface YubiKeySigningParameters extends YubiKeySigningParametersOptional {
+    id: string | number;
+    otp: string;
+    nonce: string;
+
+    [key: string]: any;
+}
+
+export interface YubiKeyConfig {
+    clientId: number | string;
+    apiKey: string;
+    serviceUrl?: string;
+    signingParameters?: YubiKeySigningParametersOptional;
+}
+
+export enum YubiKeyValidationStatus {
+    OK = 'OK',
+    BAD_OTP = 'BAD_OTP',
+    REPLAYED_OTP = 'REPLAYED_OTP',
+    BAD_SIGNATURE = 'BAD_SIGNATURE',
+    MISSING_PARAMETER = 'MISSING_PARAMETER',
+    NO_SUCH_CLIENT = 'NO_SUCH_CLIENT',
+    OPERATION_NOT_ALLOWED = 'OPERATION_NOT_ALLOWED',
+    BACKEND_ERROR = 'BACKEND_ERROR',
+    NOT_ENOUGH_ANSWERS = 'NOT_ENOUGH_ANSWERS',
+    REPLAYED_REQUEST = 'REPLAYED_REQUEST'
+}
+
+interface YubiKeyValidationResponse {
+    h: string;
+    t: Date;
+    otp: string;
+    nonce: string;
+    sl?: number;
+    status: YubiKeyValidationStatus;
+}
+
+export interface YubiKeyValidationResult extends YubiKeyValidationResponse {
+    isOk: boolean;
+    deviceId: string;
+    signatureValid: boolean;
+}
+
+export default class YubiKeyOTP {
+    /**
+     * Verifies a YubiKey OTP code
+     *
+     * @param config
+     * @param otp
+     * @param timeout
+     */
+    public static async verify (
+        otp: string | number,
+        config: YubiKeyConfig,
+        timeout = 5000
+    ): Promise<YubiKeyValidationResult> {
+        if (typeof otp === 'number') {
+            otp = otp.toString();
+        }
+
+        config.serviceUrl ||= 'https://api.yubico.com/wsapi/2.0/verify';
+
+        const nonce = v4().replace(/-/g, '');
+
+        const params: YubiKeySigningParameters = {
+            ...config.signingParameters,
+            id: config.clientId,
+            nonce,
+            otp
+        };
+
+        const _params = YubiKeyOTP.construct_param_string(params);
+
+        const signature = YubiKeyOTP.generate_signature(_params, config.apiKey);
+
+        const url = `${config.serviceUrl}?${_params}&h=${signature}`;
+
+        const result = await YubiKeyOTP.validate(url, timeout);
+
+        const _checkParams = YubiKeyOTP.construct_param_string(result);
+
+        const _signature = YubiKeyOTP.generate_signature(_checkParams, config.apiKey);
+
+        result.t = new Date((result.t as any).split('Z')[0]);
+
+        if (result.sl) {
+            result.sl = parseInt(result.sl as any);
+        }
+
+        return {
+            ...result,
+            deviceId: otp.substring(0, 12),
+            signatureValid: _signature === result.h,
+            isOk: result.status === YubiKeyValidationStatus.OK
+        };
+    }
+
+    /**
+     * Generates a message signature
+     *
+     * @param message
+     * @param apiKey
+     * @private
+     */
+    private static generate_signature (message: string, apiKey: string): string {
+        const toOctet = (str: string): Int8Array => {
+            const result: Int8Array = new Int8Array(str.length);
+
+            for (let i = 0; i < str.length; i++) {
+                result[i] = str.charCodeAt(i);
+            }
+
+            return result;
+        };
+
+        const _apiKey = Buffer.from(apiKey, 'base64');
+        const _message = toOctet(message);
+
+        return createHmac('sha1', _apiKey)
+            .update(_message)
+            .digest('base64');
+    }
+
+    /**
+     * Constructs a message payload string
+     *
+     * @param params
+     * @private
+     */
+    private static construct_param_string (params: any): string {
+        return Object.keys(params)
+            .filter(key => key !== 'h')
+            .sort()
+            .map(key => `${key}=${params[key]}`)
+            .join('&');
+    }
+
+    /**
+     * Validates a YubiKey OTP code with the YubiKey server(s)
+     *
+     * @param url
+     * @param timeout
+     * @private
+     */
+    private static async validate (
+        url: string,
+        timeout = 5000
+    ): Promise<YubiKeyValidationResponse> {
+        const controller = new AbortController();
+
+        const _timeout = setTimeout(() => controller.abort(), timeout);
+
+        const response = await fetch(url, {
+            signal: controller.signal as any
+        });
+
+        clearTimeout(_timeout);
+
+        if (!response.ok) {
+            throw new Error(`${response.url} [${response.status}]: ${response.statusText}`);
+        }
+
+        const data = await response.text();
+
+        const result: any = {};
+
+        data.split('\r\n')
+            .filter(line => line.length !== 0)
+            .forEach(line => {
+                const index = line.indexOf('=');
+
+                const key = line.substring(0, index).trim();
+
+                result[key] = line.substring(index + 1).trim();
+            });
+
+        return result;
+    }
+}
