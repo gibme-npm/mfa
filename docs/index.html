@@ -13,10 +13,71 @@
 <div class="tsd-page-title">
 <h2>@gibme/mfa</h2></div>
 <div class="tsd-panel tsd-typography">
-<a href="#simple-mfa2fa-helper" id="simple-mfa2fa-helper" style="color: inherit; text-decoration: none;">
-  <h1>Simple MFA/2FA Helper</h1>
+<a href="#mfa2fa-one-time-password-otp-library" id="mfa2fa-one-time-password-otp-library" style="color: inherit; text-decoration: none;">
+  <h1>MFA/2FA One-Time Password (OTP) Library</h1>
 </a>
-<p>See <code>tests/test.ts</code> for sample code</p>
+
+<a href="#secret" id="secret" style="color: inherit; text-decoration: none;">
+  <h2>Secret</h2>
+</a>
+<p>The <a href="https://en.wikipedia.org/wiki/Random_seed">seed</a> used with TOTP and HOTP one-time password(s).</p>
+
+<a href="#generate" id="generate" style="color: inherit; text-decoration: none;">
+  <h3>Generate</h3>
+</a>
+<pre><code class="language-typescript"><span class="hl-0">import</span><span class="hl-1"> { </span><span class="hl-2">Secret</span><span class="hl-1"> } </span><span class="hl-0">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@gibme/mfa&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-5">secret</span><span class="hl-1"> = </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-6">Secret</span><span class="hl-1">();</span>
+</code></pre>
+
+<a href="#restore" id="restore" style="color: inherit; text-decoration: none;">
+  <h3>Restore</h3>
+</a>
+<pre><code class="language-typescript"><span class="hl-0">import</span><span class="hl-1"> { </span><span class="hl-2">Secret</span><span class="hl-1"> } </span><span class="hl-0">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@gibme/mfa&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-5">Secret</span><span class="hl-1"> = </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-6">Secret</span><span class="hl-1">(</span><span class="hl-3">&#39;ZK26SHUWGERAHUOTQMV7V3YMWIX4XUWS&#39;</span><span class="hl-1">);</span>
+</code></pre>
+
+<a href="#totp" id="totp" style="color: inherit; text-decoration: none;">
+  <h2><a href="https://en.wikipedia.org/wiki/Time-based_one-time_password">TOTP</a></h2>
+</a>
+<p>Used to create and/or verify a Time-based one-time password. The OTP value is based upon the current time and the period specified.</p>
+
+<a href="#generate-1" id="generate-1" style="color: inherit; text-decoration: none;">
+  <h3>Generate</h3>
+</a>
+<pre><code class="language-typescript"><span class="hl-0">import</span><span class="hl-1"> { </span><span class="hl-2">TOTP</span><span class="hl-1"> } </span><span class="hl-0">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@gibme/mfa&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> [</span><span class="hl-5">token</span><span class="hl-1">] = </span><span class="hl-5">TOTP</span><span class="hl-1">.</span><span class="hl-6">generate</span><span class="hl-1">();</span>
+</code></pre>
+
+<a href="#verify" id="verify" style="color: inherit; text-decoration: none;">
+  <h3>Verify</h3>
+</a>
+<pre><code class="language-typescript"><span class="hl-0">import</span><span class="hl-1"> { </span><span class="hl-2">TOTP</span><span class="hl-1"> } </span><span class="hl-0">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@gibme/mfa&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> [</span><span class="hl-5">success</span><span class="hl-1">, </span><span class="hl-5">delta_window</span><span class="hl-1">] = </span><span class="hl-5">TOTP</span><span class="hl-1">.</span><span class="hl-6">verify</span><span class="hl-1">(</span><span class="hl-2">token</span><span class="hl-1">, { </span><span class="hl-2">secret</span><span class="hl-1"> });</span><br/><br/><span class="hl-0">if</span><span class="hl-1"> (!</span><span class="hl-2">success</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-0">throw</span><span class="hl-1"> </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-6">Error</span><span class="hl-1">(</span><span class="hl-3">&#39;Invalid OTP code supplied&#39;</span><span class="hl-1">);</span><br/><span class="hl-1">}</span>
+</code></pre>
+
+<a href="#hotp" id="hotp" style="color: inherit; text-decoration: none;">
+  <h2><a href="https://en.wikipedia.org/wiki/HMAC-based_one-time_password">HOTP</a></h2>
+</a>
+<p>Used to create and/or verify a HMAC-based one-time password. OTPs are generated based upon the counter value supplied.</p>
+
+<a href="#generate-2" id="generate-2" style="color: inherit; text-decoration: none;">
+  <h3>Generate</h3>
+</a>
+<pre><code class="language-typescript"><span class="hl-0">import</span><span class="hl-1"> { </span><span class="hl-2">HOTP</span><span class="hl-1"> } </span><span class="hl-0">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@gibme/mfa&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> [</span><span class="hl-5">token</span><span class="hl-1">] = </span><span class="hl-5">HOTP</span><span class="hl-1">.</span><span class="hl-6">generate</span><span class="hl-1">({ </span><span class="hl-2">counter:</span><span class="hl-1"> </span><span class="hl-7">2</span><span class="hl-1"> });</span>
+</code></pre>
+
+<a href="#verify-1" id="verify-1" style="color: inherit; text-decoration: none;">
+  <h3>Verify</h3>
+</a>
+<pre><code class="language-typescript"><span class="hl-0">import</span><span class="hl-1"> { </span><span class="hl-2">HOTP</span><span class="hl-1"> } </span><span class="hl-0">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@gibme/mfa&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-4">const</span><span class="hl-1"> [</span><span class="hl-5">success</span><span class="hl-1">, </span><span class="hl-5">delta_window</span><span class="hl-1">] = </span><span class="hl-5">HOTP</span><span class="hl-1">.</span><span class="hl-6">verify</span><span class="hl-1">(</span><span class="hl-2">token</span><span class="hl-1">, { </span><span class="hl-2">secret</span><span class="hl-1">, </span><span class="hl-2">counter:</span><span class="hl-1"> </span><span class="hl-7">2</span><span class="hl-1"> });</span><br/><br/><span class="hl-0">if</span><span class="hl-1"> (!</span><span class="hl-2">success</span><span class="hl-1">) {</span><br/><span class="hl-1">    </span><span class="hl-0">throw</span><span class="hl-1"> </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-6">Error</span><span class="hl-1">(</span><span class="hl-3">&#39;Invalid OTP code supplied&#39;</span><span class="hl-1">);</span><br/><span class="hl-1">}</span>
+</code></pre>
+
+<a href="#yubikey-otp" id="yubikey-otp" style="color: inherit; text-decoration: none;">
+  <h2><a href="https://www.yubico.com/products/">YubiKey</a> OTP</h2>
+</a>
+<p>To obtain a YubiKey API key head on over to the <a href="https://upgrade.yubico.com/getapikey/">Yubico API key signup</a> page.</p>
+
+<a href="#verify-2" id="verify-2" style="color: inherit; text-decoration: none;">
+  <h3>Verify</h3>
+</a>
+<pre><code class="language-typescript"><span class="hl-0">import</span><span class="hl-1"> { </span><span class="hl-2">YubiKeyOTP</span><span class="hl-1"> } </span><span class="hl-0">from</span><span class="hl-1"> </span><span class="hl-3">&#39;@gibme/mfa&#39;</span><span class="hl-1">;</span><br/><br/><span class="hl-1">(</span><span class="hl-4">async</span><span class="hl-1"> () </span><span class="hl-4">=&gt;</span><span class="hl-1"> {</span><br/><span class="hl-1">    </span><span class="hl-4">const</span><span class="hl-1"> </span><span class="hl-5">response</span><span class="hl-1"> = </span><span class="hl-0">await</span><span class="hl-1"> </span><span class="hl-2">YubiKeyOTP</span><span class="hl-1">.</span><span class="hl-6">verify</span><span class="hl-1">(</span><span class="hl-2">token</span><span class="hl-1">, {</span><br/><span class="hl-1">        </span><span class="hl-2">clientId:</span><span class="hl-1"> </span><span class="hl-7">12345</span><span class="hl-1">,</span><br/><span class="hl-1">        </span><span class="hl-2">apiKey:</span><span class="hl-1"> </span><span class="hl-3">&#39;yourapikey&#39;</span><br/><span class="hl-1">    })</span><br/><span class="hl-1">    </span><br/><span class="hl-1">    </span><span class="hl-0">if</span><span class="hl-1"> (!</span><span class="hl-2">response</span><span class="hl-1">.</span><span class="hl-2">valid</span><span class="hl-1">) {</span><br/><span class="hl-1">        </span><span class="hl-0">throw</span><span class="hl-1"> </span><span class="hl-4">new</span><span class="hl-1"> </span><span class="hl-6">Error</span><span class="hl-1">(</span><span class="hl-3">&#39;Invalid OTP code supplied&#39;</span><span class="hl-1">);</span><br/><span class="hl-1">    }</span><br/><span class="hl-1">})();</span>
+</code></pre>
 </div></div>
 <div class="col-4 col-menu menu-sticky-wrap menu-highlight">
 <div class="tsd-navigation settings">

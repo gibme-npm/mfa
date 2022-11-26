@@ -22,7 +22,13 @@ import Secret from './secret';
 import HOTP, { HOTPConfig } from './hotp';
 
 export interface TOTPConfig extends HOTPConfig {
+    /**
+     * @default 60
+     */
     period: number;
+    /**
+     * @default Date.now()
+     */
     timestamp?: Date | number;
 }
 

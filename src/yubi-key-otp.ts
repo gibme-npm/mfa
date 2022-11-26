@@ -29,16 +29,36 @@ export interface YubiKeySigningParametersOptional {
 }
 
 export interface YubiKeySigningParameters extends YubiKeySigningParametersOptional {
+    /**
+     * The Yubico API client ID
+     */
     id: string | number;
+    /**
+     * The OTP code
+     */
     otp: string;
+    /**
+     * A nonce value to prevent replay attachs
+     * @default <random>
+     */
     nonce: string;
 
     [key: string]: any;
 }
 
 export interface YubiKeyConfig {
+    /**
+     * The Yubico API client ID
+     */
     clientId: number | string;
+    /**
+     * The Yubico API key
+     */
     apiKey: string;
+    /**
+     * The Yubico OTP validation server url
+     * @default https://api.yubico.com/wsapi/2.0/verify
+     */
     serviceUrl?: string;
     signingParameters?: YubiKeySigningParametersOptional;
 }
@@ -57,18 +77,46 @@ export enum YubiKeyValidationStatus {
 }
 
 export interface YubiKeyValidationResponse {
+    /**
+     * The validation signature
+     */
     h: string;
+    /**
+     * The response timestamp
+     */
     t: Date;
+    /**
+     * The OTP code
+     */
     otp: string;
+    /**
+     * The server nonce to prevent replay attacks
+     */
     nonce: string;
     sl?: number;
+    /**
+     * The status of the request
+     */
     status: YubiKeyValidationStatus;
 }
 
 export interface YubiKeyValidationResult extends YubiKeyValidationResponse {
+    /**
+     * Whether the OTP presented is valid (okay)
+     */
     isOk: boolean;
+    /**
+     * The YubiKey device ID that presented the OTP
+     */
     deviceId: string;
+    /**
+     * Whether the response signature from the server is valid
+     */
     signatureValid: boolean;
+    /**
+     * Set to `true` if both the OTP presented and the server response signature are valid
+     */
+    valid: boolean;
 }
 
 export default abstract class YubiKeyOTP {
@@ -121,7 +169,8 @@ export default abstract class YubiKeyOTP {
             ...result,
             deviceId: otp.substring(0, 12),
             signatureValid: _signature === result.h,
-            isOk: result.status === YubiKeyValidationStatus.OK
+            isOk: result.status === YubiKeyValidationStatus.OK,
+            valid: result.status === YubiKeyValidationStatus.OK && _signature === result.h
         };
     }
 

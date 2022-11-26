@@ -31,12 +31,47 @@ export enum DigestAlgorithm {
 }
 
 export interface HOTPConfig {
+    /**
+     * Displays as the "issuer" in most Authenticator applications
+     * @default <empty>
+     */
     issuer: string;
+    /**
+     * Displays as the account label in most Authenticator applications
+     * @default 'Change Me'
+     */
     label: string;
+    /**
+     * The algorithm to use for digest generation.
+     *
+     * Note: Most authenticator applications have limited support for anything other than SHA1
+     *
+     * @default SHA1
+     */
     algorithm: DigestAlgorithm,
+    /**
+     * The number of digits to use for the OTP
+     * @default 6
+     */
     digits: 6 | 8;
+    /**
+     * The HOTP counter
+     *
+     * Note: This should be incremented upon each use to prevent replay attacks. user **must** also increment.
+     *
+     * Note: This value is overwritten when TOTP is used.
+     * @default 0
+     */
     counter: number;
+    /**
+     * The window of permitted OTP codes when verifying. A value of `1` would allow an OTP that is valid for the current
+     * counter/period +/- 1. A value of `2` would allow +/- 2.
+     * @default 1
+     */
     window: number;
+    /**
+     * The Secret seed for the generation/validation of the OTP
+     */
     secret: Secret;
 }
 

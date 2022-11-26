@@ -27,6 +27,7 @@
   "bugs": {
     "url": "https://github.com/gibme-npm/mfa/issues"
   },
+  "homepage": "https://gibme-npm.github.io/mfa/",
   "engines": {
     "node": ">=16"
   },

@@ -96,6 +96,7 @@ describe('YubiKey Tests', () => {
             apiKey
         });
 
-        assert(!response.isOk && response.signatureValid);
+        // this should fail because the response is not okay
+        assert(!response.valid && response.signatureValid);
     });
 });

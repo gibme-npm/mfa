@@ -24,8 +24,21 @@ import Base32 from '@gibme/base32';
 export type BufferEncodingLike = BufferEncoding | 'base32';
 
 export interface SecretOptions {
+    /**
+     * The secret seed
+     *
+     * If a string is supplied, `secretEncoding` is used to load the secret
+     */
     secret: string | Buffer;
+    /**
+     * The encoding of the secret seed
+     * @default base32
+     */
     secretEncoding: BufferEncodingLike;
+    /**
+     * The byte size of the seed
+     * @default 20
+     */
     size: number;
 }
 
@@ -35,10 +48,14 @@ export default class Secret {
     /**
      * Constructs a new instance of an OTP secret
      *
-     * @param config
+     * @param configOrSeed if a string, base32 decoding will be used
      */
-    constructor (config: Partial<SecretOptions> = {}) {
-        const _config = config as any;
+    constructor (configOrSeed: Partial<SecretOptions> | string = {}) {
+        if (typeof configOrSeed === 'string') {
+            configOrSeed = { secret: configOrSeed };
+        }
+
+        const _config = configOrSeed as any;
 
         _config.size ||= 20;
         _config.secretEncoding ||= 'base32';
