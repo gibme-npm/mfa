@@ -29,10 +29,10 @@
   resolved "https://registry.yarnpkg.com/@gibme/base32/-/base32-1.0.0.tgz#92faad52bcf1628303c265b9aee068b99a83a1f6"
   integrity sha512-s5FvYn57+Aqaw4rTx1NddtJAPqYOu7ZCK1Ogl/UkxR/ZuXAqnbDjudoYKddDybVQ/3UapWbTtBBmhJYyl1AFrw==
 
-"@gibme/bytepack@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@gibme/bytepack/-/bytepack-1.0.0.tgz#0d222b49da0e9bb1f703d93844c970c32c0214f5"
-  integrity sha512-xEEEoTHL9BdsXuVDnG6u+G+NMdT3IRSeeqEoMjgVMz2sb6I+EvnuFZYvKulk8uPBrKZq5e4SlKA/at6UrJnVsw==
+"@gibme/bytepack@^1.0.2":
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/@gibme/bytepack/-/bytepack-1.0.2.tgz#1df19a23ba92576ba766ce81945b806d146df73a"
+  integrity sha512-zGt2I9jDR6bxoRIZq1NgVJ3Ht/+zt4qdKtYZCrtjHBV9OrOcgItffZ8+S4QCYkbIkRwQiDP9C2hFvEWY++zX0A==
   dependencies:
     big-integer "^1.6.51"
 

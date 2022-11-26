@@ -92,9 +92,8 @@ export default abstract class HOTP {
     ): [string, Secret] {
         const _config = HOTP.mergeConfig(config);
 
-        const _counter = new Writer();
-
-        _counter.uint64_t(_config.counter, true);
+        const _counter = new Writer()
+            .uint64_t(_config.counter, true);
 
         const digest = HOTP.digest(_config.algorithm, _config._secret.buffer, _counter.buffer).valueOf();
 
