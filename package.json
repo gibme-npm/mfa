@@ -2,7 +2,7 @@
   "name": "@gibme/mfa",
   "version": "1.0.1",
   "description": "A simple mfa helper",
-  "main": "dist/mfa.bundle.js",
+  "main": "dist/mfa.js",
   "types": "dist/mfa.d.ts",
   "files": [
     "dist/*"
