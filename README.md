@@ -23,7 +23,7 @@ console.log(secret.toString());
 ```typescript
 import { Secret } from '@gibme/mfa';
 
-const Secret = new Secret('ZK26SHUWGERAHUOTQMV7V3YMWIX4XUWS');
+const secret = new Secret('ZK26SHUWGERAHUOTQMV7V3YMWIX4XUWS');
 ```
 
 ## [TOTP](https://en.wikipedia.org/wiki/Time-based_one-time_password)
@@ -35,7 +35,7 @@ Used to create and/or verify a Time-based one-time password. The OTP value is ba
 ```typescript
 import { TOTP } from '@gibme/mfa';
 
-const [token] = TOTP.generate();
+const [token] = TOTP.generate({ secret });
 ```
 
 ### Verify
@@ -59,7 +59,7 @@ Used to create and/or verify a HMAC-based one-time password. OTPs are generated 
 ```typescript
 import { HOTP } from '@gibme/mfa';
 
-const [token] = HOTP.generate({ counter: 2 });
+const [token] = HOTP.generate({ secret, counter: 2 });
 ```
 
 ### Verify
