@@ -1,0 +1,11 @@
+{
+  "out": "./docs",
+  "excludeExternals": true,
+  "excludePrivate": true,
+  "entryPoints": [
+    "./src/mfa.ts"
+  ],
+  "disableSources": true,
+  "hideGenerator": true,
+  "githubPages": true
+}

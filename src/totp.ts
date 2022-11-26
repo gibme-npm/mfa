@@ -26,7 +26,7 @@ export interface TOTPConfig extends HOTPConfig {
     timestamp?: Date | number;
 }
 
-export default class TOTP extends HOTP {
+export default abstract class TOTP extends HOTP {
     /**
      * Generates a TOTP token using the supplied configuration values
      *

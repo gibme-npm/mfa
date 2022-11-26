@@ -18,9 +18,32 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import YubiKeyOTP, { YubiKeyConfig } from './yubi-key-otp';
+import YubiKeyOTP, {
+    YubiKeyConfig,
+    YubiKeyValidationResponse,
+    YubiKeySigningParameters,
+    YubiKeySigningParametersOptional,
+    YubiKeyValidationResult,
+    YubiKeyValidationStatus
+} from './yubi-key-otp';
 import TOTP, { TOTPConfig } from './totp';
 import HOTP, { DigestAlgorithm, HOTPConfig } from './hotp';
-import Secret from './secret';
+import Secret, { SecretOptions, BufferEncodingLike } from './secret';
 
-export { YubiKeyOTP, YubiKeyConfig, TOTP, TOTPConfig, HOTP, HOTPConfig, DigestAlgorithm, Secret };
+export {
+    YubiKeyOTP,
+    YubiKeyConfig,
+    YubiKeyValidationResponse,
+    YubiKeySigningParameters,
+    YubiKeySigningParametersOptional,
+    YubiKeyValidationResult,
+    YubiKeyValidationStatus,
+    TOTP,
+    TOTPConfig,
+    HOTP,
+    HOTPConfig,
+    DigestAlgorithm,
+    Secret,
+    SecretOptions,
+    BufferEncodingLike
+};

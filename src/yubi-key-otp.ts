@@ -19,7 +19,6 @@
 // SOFTWARE.
 
 import fetch from 'cross-fetch';
-import AbortController from 'abort-controller';
 import { createHmac } from 'crypto';
 import { v4 } from 'uuid';
 
@@ -29,7 +28,7 @@ export interface YubiKeySigningParametersOptional {
     timeout?: number;
 }
 
-interface YubiKeySigningParameters extends YubiKeySigningParametersOptional {
+export interface YubiKeySigningParameters extends YubiKeySigningParametersOptional {
     id: string | number;
     otp: string;
     nonce: string;
@@ -57,7 +56,7 @@ export enum YubiKeyValidationStatus {
     REPLAYED_REQUEST = 'REPLAYED_REQUEST'
 }
 
-interface YubiKeyValidationResponse {
+export interface YubiKeyValidationResponse {
     h: string;
     t: Date;
     otp: string;
@@ -72,7 +71,7 @@ export interface YubiKeyValidationResult extends YubiKeyValidationResponse {
     signatureValid: boolean;
 }
 
-export default class YubiKeyOTP {
+export default abstract class YubiKeyOTP {
     /**
      * Verifies a YubiKey OTP code
      *
@@ -182,7 +181,7 @@ export default class YubiKeyOTP {
         const _timeout = setTimeout(() => controller.abort(), timeout);
 
         const response = await fetch(url, {
-            signal: controller.signal as any
+            signal: controller.signal
         });
 
         clearTimeout(_timeout);

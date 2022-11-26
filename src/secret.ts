@@ -21,7 +21,7 @@
 import { randomBytes } from 'crypto';
 import Base32 from '@gibme/base32';
 
-type BufferEncodingLike = BufferEncoding | 'base32';
+export type BufferEncodingLike = BufferEncoding | 'base32';
 
 export interface SecretOptions {
     secret: string | Buffer;

@@ -40,7 +40,7 @@ export interface HOTPConfig {
     secret: Secret;
 }
 
-export default class HOTP {
+export default abstract class HOTP {
     /**
      * Generates a HOTP token using the supplied configuration values
      *
