@@ -19,7 +19,7 @@
 // SOFTWARE.
 
 import Secret from './secret';
-import HOTP, { HOTPConfig } from './hotp';
+import HOTP, { HOTPConfig, HOTPConfigFinal } from './hotp';
 
 export interface TOTPConfig extends HOTPConfig {
     /**
@@ -31,6 +31,9 @@ export interface TOTPConfig extends HOTPConfig {
      */
     timestamp?: Date | number;
 }
+
+/** @ignore */
+interface TOTPConfigFinal extends HOTPConfigFinal, TOTPConfig {}
 
 export default abstract class TOTP extends HOTP {
     /**
@@ -92,8 +95,9 @@ export default abstract class TOTP extends HOTP {
      *
      * @param config
      * @protected
+     * @ignore
      */
-    protected static mergeConfig (config: Partial<TOTPConfig>): TOTPConfig {
+    protected static mergeConfig (config: Partial<TOTPConfig>): TOTPConfigFinal {
         config.label ||= 'TOTP Authenticator';
         config.period ||= 60;
         config.timestamp ||= new Date();

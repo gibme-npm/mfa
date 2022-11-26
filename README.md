@@ -14,6 +14,8 @@ The [seed](https://en.wikipedia.org/wiki/Random_seed) used with TOTP and HOTP on
 import { Secret } from '@gibme/mfa';
 
 const secret = new Secret();
+
+console.log(secret.toString());
 ```
 
 ### Restore

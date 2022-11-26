@@ -71,8 +71,14 @@ export interface HOTPConfig {
     window: number;
     /**
      * The Secret seed for the generation/validation of the OTP
+     * @default <random>
      */
-    secret: Secret;
+    secret: Secret | string;
+}
+
+/** @ignore */
+export interface HOTPConfigFinal extends HOTPConfig {
+    _secret: Secret;
 }
 
 export default abstract class HOTP {
@@ -90,7 +96,7 @@ export default abstract class HOTP {
 
         _counter.uint64_t(_config.counter);
 
-        const digest = HOTP.digest(_config.algorithm, _config.secret.buffer, _counter.buffer).valueOf();
+        const digest = HOTP.digest(_config.algorithm, _config._secret.buffer, _counter.buffer).valueOf();
 
         const offset = digest[digest.byteLength - 1] & 15;
 
@@ -101,7 +107,7 @@ export default abstract class HOTP {
                 (digest[offset + 3] & 255)) %
             10 ** _config.digits;
 
-        return [otp.toString().padStart(_config.digits, '0'), _config.secret];
+        return [otp.toString().padStart(_config.digits, '0'), _config._secret];
     }
 
     /**
@@ -177,17 +183,25 @@ export default abstract class HOTP {
      *
      * @param config
      * @protected
+     * @ignore
      */
-    protected static mergeConfig (config: Partial<HOTPConfig>): HOTPConfig {
+    protected static mergeConfig (config: Partial<HOTPConfig>): HOTPConfigFinal {
         config.issuer ||= '';
         config.label ||= 'HOTP Authenticator';
         config.algorithm ||= DigestAlgorithm.SHA1;
         config.digits ||= 6;
         config.counter ||= 0;
         config.window ||= 1;
-        config.secret ||= new Secret();
 
-        return config as any;
+        const _config: HOTPConfigFinal = config as any;
+
+        if (config.secret instanceof Secret) {
+            _config._secret = config.secret;
+        } else {
+            _config._secret = new Secret(config.secret);
+        }
+
+        return _config;
     }
 
     /**
