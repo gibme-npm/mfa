@@ -94,7 +94,7 @@ export default abstract class HOTP {
 
         const _counter = new Writer();
 
-        _counter.uint64_t(_config.counter);
+        _counter.uint64_t(_config.counter, true);
 
         const digest = HOTP.digest(_config.algorithm, _config._secret.buffer, _counter.buffer).valueOf();
 
