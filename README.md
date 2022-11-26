@@ -1,5 +1,9 @@
 # MFA/2FA One-Time Password (OTP) Library
 
+## Documentation
+
+[https://gibme-npm.github.io/mfa/](https://gibme-npm.github.io/mfa/)
+
 ## Secret
 
 The [seed](https://en.wikipedia.org/wiki/Random_seed) used with TOTP and HOTP one-time password(s).
