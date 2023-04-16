@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import fetch from 'cross-fetch';
+import fetch from '@gibme/fetch';
 import { createHmac } from 'crypto';
 import { v4 } from 'uuid';
 
@@ -225,15 +225,9 @@ export default abstract class YubiKeyOTP {
         url: string,
         timeout = 5000
     ): Promise<YubiKeyValidationResponse> {
-        const controller = new AbortController();
-
-        const _timeout = setTimeout(() => controller.abort(), timeout);
-
         const response = await fetch(url, {
-            signal: controller.signal
+            timeout
         });
-
-        clearTimeout(_timeout);
 
         if (!response.ok) {
             throw new Error(`${response.url} [${response.status}]: ${response.statusText}`);
