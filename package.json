@@ -1,6 +1,6 @@
 {
   "name": "@gibme/mfa",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "A simple mfa helper",
   "main": "dist/mfa.js",
   "types": "dist/mfa.d.ts",
