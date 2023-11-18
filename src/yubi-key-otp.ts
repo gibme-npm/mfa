@@ -136,7 +136,7 @@ export default abstract class YubiKeyOTP {
             otp = otp.toString();
         }
 
-        config.serviceUrl ||= 'https://api.yubico.com/wsapi/2.0/verify';
+        config.serviceUrl ??= 'https://api.yubico.com/wsapi/2.0/verify';
 
         const nonce = v4().replace(/-/g, '');
 

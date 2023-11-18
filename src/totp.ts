@@ -70,8 +70,7 @@ export default abstract class TOTP extends HOTP {
     public static toString (config: Partial<TOTPConfig> = {}): string {
         const _config = TOTP.mergeConfig(config);
 
-        return super._toString(_config, 'totp') +
-            `period=${encodeURIComponent(_config.period)}`;
+        return super._toString(_config, 'totp', _config.period);
     }
 
     /**
@@ -98,9 +97,9 @@ export default abstract class TOTP extends HOTP {
      * @ignore
      */
     protected static mergeConfig (config: Partial<TOTPConfig>): TOTPConfigFinal {
-        config.label ||= 'TOTP Authenticator';
-        config.period ||= 60;
-        config.timestamp ||= new Date();
+        config.label ??= 'TOTP Authenticator';
+        config.period ??= 60;
+        config.timestamp ??= new Date();
 
         if (typeof config.timestamp === 'number') {
             config.timestamp = new Date(config.timestamp * 1000);

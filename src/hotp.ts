@@ -185,12 +185,12 @@ export default abstract class HOTP {
      * @ignore
      */
     protected static mergeConfig (config: Partial<HOTPConfig>): HOTPConfigFinal {
-        config.issuer ||= '';
-        config.label ||= 'HOTP Authenticator';
-        config.algorithm ||= DigestAlgorithm.SHA1;
-        config.digits ||= 6;
-        config.counter ||= 0;
-        config.window ||= 1;
+        config.issuer ??= '';
+        config.label ??= 'HOTP Authenticator';
+        config.algorithm ??= DigestAlgorithm.SHA1;
+        config.digits ??= 6;
+        config.counter ??= 0;
+        config.window ??= 1;
 
         const _config: HOTPConfigFinal = config as any;
 
@@ -208,23 +208,52 @@ export default abstract class HOTP {
      *
      * @param config
      * @param type
+     * @param period
      * @protected
      */
     protected static _toString (
         config: HOTPConfig,
-        type: 'totp' | 'hotp'
+        type: 'totp' | 'hotp',
+        period?: number
     ): string {
+        config.issuer = config.issuer.trim();
+        config.label = config.label.trim();
+
         const encode = encodeURIComponent;
 
         let url = `otpauth://${type}/`;
 
-        url += config.issuer.length > 0
-            ? `${encode(config.issuer)}:${encode(config.label)}?issuer=${encode(config.issuer)}`
-            : `${encode(config.label)}?`;
+        const prefix = (() => {
+            const parts: string[] = [];
 
-        url += `secret=${encode(config.secret.toString())}&`;
-        url += `algorithm=${encode(config.algorithm.toUpperCase())}&`;
-        url += `digits=${encode(config.digits)}&`;
+            if (config.issuer.length > 0) {
+                parts.push(encode(config.issuer));
+            }
+
+            if (config.label.length > 0) {
+                parts.push(encode(config.label));
+            }
+
+            return parts.join(':');
+        })();
+
+        url += `${prefix}?`;
+
+        const suffix = new URLSearchParams();
+
+        suffix.set('secret', config.secret.toString());
+        suffix.set('algorithm', config.algorithm.toUpperCase());
+        suffix.set('digits', config.digits.toString());
+
+        if (period) {
+            suffix.set('period', period.toString());
+        }
+
+        url += suffix.toString();
+
+        if (config.issuer.length > 0) {
+            url += `&issuer=${encode(config.issuer)}`;
+        }
 
         return url;
     }

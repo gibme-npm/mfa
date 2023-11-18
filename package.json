@@ -1,6 +1,6 @@
 {
   "name": "@gibme/mfa",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "A simple mfa helper",
   "main": "dist/mfa.js",
   "types": "dist/mfa.d.ts",
@@ -61,31 +61,31 @@
     "email": "brandonlehmann@gmail.com"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.1",
-    "@types/node": "^20.4.8",
-    "@typescript-eslint/eslint-plugin": "^6.2.1",
-    "@typescript-eslint/parser": "^6.2.1",
+    "@types/mocha": "^10.0.4",
+    "@types/node": "^20.9.1",
+    "@typescript-eslint/eslint-plugin": "^6.11.0",
+    "@typescript-eslint/parser": "^6.11.0",
     "dotenv": "^16.3.1",
-    "eslint": "^8.46.0",
+    "eslint": "^8.54.0",
     "eslint-config-standard": "^17.1.0",
-    "eslint-plugin-import": "^2.28.0",
-    "eslint-plugin-n": "^16.0.1",
+    "eslint-plugin-import": "^2.29.0",
+    "eslint-plugin-n": "^16.3.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
     "mocha": "^10.2.0",
     "ts-node": "^10.9.1",
-    "typedoc": "^0.24.8",
-    "typescript": "^5.1.6"
+    "typedoc": "^0.25.3",
+    "typescript": "^5.2.2"
   },
   "dependencies": {
     "@gibme/base32": "^1.0.3",
     "@gibme/bytepack": "^1.0.4",
     "@gibme/fetch": "^1.0.3",
-    "@types/uuid": "^9.0.2",
+    "@types/uuid": "^9.0.7",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.0",
     "process": "^0.11.10",
     "stream-browserify": "^3.0.0",
-    "uuid": "^9.0.0"
+    "uuid": "^9.0.1"
   }
 }

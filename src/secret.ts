@@ -57,8 +57,8 @@ export default class Secret {
 
         const _config = configOrSeed as any;
 
-        _config.size ||= 20;
-        _config.secretEncoding ||= 'base32';
+        _config.size ??= 20;
+        _config.secretEncoding ??= 'base32';
 
         if (_config.secret instanceof Buffer) {
             this.buffer = _config.secret;
