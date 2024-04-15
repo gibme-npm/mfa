@@ -173,7 +173,7 @@ export default abstract class HOTP {
         width = 256,
         height = 256
     ): string {
-        return `https://chart.googleapis.com/chart?cht=qr&chs=${width}x${height}` +
+        return `https://quickchart.io/chart?cht=qr&chs=${width}x${height}` +
             `&chl=${encodeURIComponent(HOTP.toString(config))}`;
     }
 
