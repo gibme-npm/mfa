@@ -1,6 +1,6 @@
 {
   "name": "@gibme/mfa",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "A simple mfa helper",
   "main": "dist/mfa.js",
   "types": "dist/mfa.d.ts",
@@ -78,14 +78,10 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
-    "@gibme/base32": "^1.0.6",
-    "@gibme/bytepack": "^1.0.6",
-    "@gibme/fetch": "^1.0.6",
-    "@types/uuid": "^9.0.8",
-    "buffer": "^6.0.3",
-    "crypto-browserify": "^3.12.0",
-    "process": "^0.11.10",
-    "stream-browserify": "^3.0.0",
-    "uuid": "^9.0.1"
+    "@gibme/base32": "^1.0.10",
+    "@gibme/bytepack": "^1.0.10",
+    "@gibme/fetch": "^1.0.14",
+    "@types/uuid": "^10.0.0",
+    "uuid": "^10.0.0"
   }
 }
