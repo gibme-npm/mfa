@@ -143,6 +143,7 @@ export default abstract class HOTP {
 
             if (timingSafeEqual(Buffer.from(otp), Buffer.from(token))) {
                 delta = i - _config.counter;
+                break;
             }
         }
 

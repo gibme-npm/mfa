@@ -23,7 +23,7 @@ import HOTP, { HOTPConfig, HOTPConfigFinal } from './hotp';
 
 export interface TOTPConfig extends HOTPConfig {
     /**
-     * @default 60
+     * @default 30 seconds
      */
     period: number;
     /**
@@ -98,7 +98,7 @@ export default abstract class TOTP extends HOTP {
      */
     protected static mergeConfig (config: Partial<TOTPConfig>): TOTPConfigFinal {
         config.label ??= 'TOTP Authenticator';
-        config.period ??= 60;
+        config.period ??= 30;
         config.timestamp ??= new Date();
 
         if (typeof config.timestamp === 'number') {

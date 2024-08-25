@@ -31,11 +31,6 @@ export interface SecretOptions {
      */
     secret: string | Buffer;
     /**
-     * The encoding of the secret seed
-     * @default base32
-     */
-    secretEncoding: BufferEncodingLike;
-    /**
      * The byte size of the seed
      * @default 20
      */
@@ -52,20 +47,17 @@ export default class Secret {
      */
     constructor (configOrSeed: Partial<SecretOptions> | string = {}) {
         if (typeof configOrSeed === 'string') {
-            configOrSeed = { secret: configOrSeed };
+            configOrSeed = { secret: configOrSeed } as SecretOptions;
         }
 
-        const _config = configOrSeed as any;
+        configOrSeed.size ??= 20;
 
-        _config.size ??= 20;
-        _config.secretEncoding ??= 'base32';
-
-        if (_config.secret instanceof Buffer) {
-            this.buffer = _config.secret;
-        } else if (_config.secret) {
-            this.buffer = Base32.decode(_config.secret);
+        if (configOrSeed.secret instanceof Buffer) {
+            this.buffer = configOrSeed.secret;
+        } else if (configOrSeed.secret) {
+            this.buffer = Base32.decode(configOrSeed.secret.replace(/ /g, ''));
         } else {
-            this.buffer = randomBytes(_config.size);
+            this.buffer = randomBytes(configOrSeed.size);
         }
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "@gibme/mfa",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "A simple mfa helper",
   "main": "dist/mfa.js",
   "types": "dist/mfa.d.ts",
@@ -53,7 +53,7 @@
   },
   "homepage": "https://gibme-npm.github.io/mfa/",
   "engines": {
-    "node": ">=16"
+    "node": ">=18"
   },
   "engineStrict": true,
   "author": {

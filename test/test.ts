@@ -33,7 +33,7 @@ describe('TOTP Tests', () => {
     it('Generate', () => {
         const [, _secret] = TOTP.generate({ secret });
 
-        assert(secret.toString() === _secret.toString());
+        assert.equal(_secret.toString(), secret.toString());
     });
 
     it('Verify', () => {
@@ -41,7 +41,7 @@ describe('TOTP Tests', () => {
 
         const [success] = TOTP.verify(token, { secret });
 
-        assert(success);
+        assert.deepEqual(true, success);
     });
 
     it('Verify [Failure]', async () => {
@@ -51,7 +51,7 @@ describe('TOTP Tests', () => {
 
         const [success] = TOTP.verify(token, { secret, period: 2 });
 
-        assert(!success);
+        assert.deepEqual(false, success);
     });
 });
 
@@ -61,7 +61,7 @@ describe('HOTP Tests', () => {
     it('Generate', () => {
         const [, _secret] = HOTP.generate({ secret });
 
-        assert(secret.toString() === _secret.toString());
+        assert.equal(_secret.toString(), secret.toString());
     });
 
     it('Verify', () => {
@@ -69,7 +69,7 @@ describe('HOTP Tests', () => {
 
         const [success] = HOTP.verify(token, { secret });
 
-        assert(success);
+        assert.deepEqual(true, success);
     });
 
     it('Verify [Failure]', async () => {
@@ -77,7 +77,7 @@ describe('HOTP Tests', () => {
 
         const [success] = HOTP.verify(token, { secret, counter: 2 });
 
-        assert(!success);
+        assert.deepEqual(false, success);
     });
 });
 
