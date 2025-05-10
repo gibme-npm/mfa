@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2023, Brandon Lehmann <brandonlehmann@gmail.com>
+// Copyright (c) 2019-2025, Brandon Lehmann <brandonlehmann@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,30 +19,16 @@
 // SOFTWARE.
 
 import Secret from './secret';
-import HOTP, { HOTPConfig, HOTPConfigFinal } from './hotp';
+import HOTP from './hotp';
 
-export interface TOTPConfig extends HOTPConfig {
-    /**
-     * @default 30 seconds
-     */
-    period: number;
-    /**
-     * @default Date.now()
-     */
-    timestamp?: Date | number;
-}
-
-/** @ignore */
-interface TOTPConfigFinal extends HOTPConfigFinal, TOTPConfig {}
-
-export default abstract class TOTP extends HOTP {
+export abstract class TOTP extends HOTP {
     /**
      * Generates a TOTP token using the supplied configuration values
      *
      * @param config
      */
-    public static generate (config: Partial<TOTPConfig> = {}): [string, Secret] {
-        const _config = TOTP.mergeConfig(config);
+    public static generate (config: Partial<TOTP.Config<Secret | string>> = {}): [string, Secret] {
+        const _config = TOTP._mergeConfig(config);
 
         return super.generate(_config);
     }
@@ -55,9 +41,9 @@ export default abstract class TOTP extends HOTP {
      */
     public static verify (
         otp: string | number,
-        config: Partial<TOTPConfig> = {}
+        config: Partial<TOTP.Config<Secret | string>> = {}
     ): [boolean, number | null] {
-        const _config = TOTP.mergeConfig(config);
+        const _config = TOTP._mergeConfig(config);
 
         return super.verify(otp, _config);
     }
@@ -67,8 +53,8 @@ export default abstract class TOTP extends HOTP {
      *
      * @param config
      */
-    public static toString (config: Partial<TOTPConfig> = {}): string {
-        const _config = TOTP.mergeConfig(config);
+    public static toString (config: Partial<TOTP.Config<Secret | string>> = {}): string {
+        const _config = TOTP._mergeConfig(config);
 
         return super._toString(_config, 'totp', _config.period);
     }
@@ -81,7 +67,7 @@ export default abstract class TOTP extends HOTP {
      * @param height
      */
     public static toQRCodeURL (
-        config: Partial<TOTPConfig> = {},
+        config: Partial<TOTP.Config<Secret | string>> = {},
         width = 256,
         height = 256
     ): string {
@@ -96,7 +82,9 @@ export default abstract class TOTP extends HOTP {
      * @protected
      * @ignore
      */
-    protected static mergeConfig (config: Partial<TOTPConfig>): TOTPConfigFinal {
+    protected static _mergeConfig<In extends TOTP.Config<Secret | string>, Out extends TOTP.Config<Secret>> (
+        config: Partial<In>
+    ): Out {
         config.label ??= 'TOTP Authenticator';
         config.period ??= 30;
         config.timestamp ??= new Date();
@@ -108,6 +96,23 @@ export default abstract class TOTP extends HOTP {
         // stomp over any supplied counter settings because we are time based
         config.counter = Math.floor(config.timestamp.getTime() / 1000 / config.period);
 
-        return super.mergeConfig(config) as any;
+        return super.mergeConfig(config);
     }
 }
+
+export namespace TOTP {
+    export type DigestAlgorithm = HOTP.DigestAlgorithm;
+
+    export type Config<SecretType extends Secret | string> = HOTP.Config<SecretType> & {
+        /**
+         * @default 30 seconds
+         */
+        period: number;
+        /**
+         * @default Date.now()
+         */
+        timestamp?: Date | number;
+    }
+}
+
+export default TOTP;

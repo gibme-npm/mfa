@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2023, Brandon Lehmann <brandonlehmann@gmail.com>
+// Copyright (c) 2019-2025, Brandon Lehmann <brandonlehmann@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,80 +22,21 @@ import Secret from './secret';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { Writer } from '@gibme/bytepack';
 
-export enum DigestAlgorithm {
-    SHA1 = 'sha1',
-    SHA224 = 'sha224',
-    SHA256 = 'sha256',
-    SHA384 = 'sha384',
-    SHA512 = 'sha512'
-}
-
-export interface HOTPConfig {
-    /**
-     * Displays as the "issuer" in most Authenticator applications
-     * @default <empty>
-     */
-    issuer: string;
-    /**
-     * Displays as the account label in most Authenticator applications
-     * @default 'Change Me'
-     */
-    label: string;
-    /**
-     * The algorithm to use for digest generation.
-     *
-     * Note: Most authenticator applications have limited support for anything other than SHA1
-     *
-     * @default SHA1
-     */
-    algorithm: DigestAlgorithm,
-    /**
-     * The number of digits to use for the OTP
-     * @default 6
-     */
-    digits: 6 | 8;
-    /**
-     * The HOTP counter
-     *
-     * Note: This should be incremented upon each use to prevent replay attacks. user **must** also increment.
-     *
-     * Note: This value is overwritten when TOTP is used.
-     * @default 0
-     */
-    counter: number;
-    /**
-     * The window of permitted OTP codes when verifying. A value of `1` would allow an OTP that is valid for the current
-     * counter/period +/- 1. A value of `2` would allow +/- 2.
-     * @default 1
-     */
-    window: number;
-    /**
-     * The Secret seed for the generation/validation of the OTP
-     * @default <random>
-     */
-    secret: Secret | string;
-}
-
-/** @ignore */
-export interface HOTPConfigFinal extends HOTPConfig {
-    _secret: Secret;
-}
-
-export default abstract class HOTP {
+export abstract class HOTP {
     /**
      * Generates a HOTP token using the supplied configuration values
      *
      * @param config
      */
     public static generate (
-        config: Partial<HOTPConfig> = {}
+        config: Partial<HOTP.Config<Secret | string>> = {}
     ): [string, Secret] {
         const _config = HOTP.mergeConfig(config);
 
         const _counter = new Writer()
             .uint64_t(_config.counter, true);
 
-        const digest = HOTP.digest(_config.algorithm, _config._secret.buffer, _counter.buffer).valueOf();
+        const digest = HOTP.digest(_config.algorithm, _config.secret.buffer, _counter.buffer).valueOf();
 
         const offset = digest[digest.byteLength - 1] & 15;
 
@@ -106,7 +47,7 @@ export default abstract class HOTP {
                 (digest[offset + 3] & 255)) %
             10 ** _config.digits;
 
-        return [otp.toString().padStart(_config.digits, '0'), _config._secret];
+        return [otp.toString().padStart(_config.digits, '0'), _config.secret];
     }
 
     /**
@@ -117,7 +58,7 @@ export default abstract class HOTP {
      */
     public static verify (
         otp: string | number,
-        config: Partial<HOTPConfig> = {}
+        config: Partial<HOTP.Config<Secret | string>> = {}
     ): [boolean, number | null] {
         const _config = HOTP.mergeConfig(config);
 
@@ -155,7 +96,7 @@ export default abstract class HOTP {
      *
      * @param config
      */
-    public static toString (config: Partial<HOTPConfig> = {}): string {
+    public static toString (config: Partial<HOTP.Config<Secret | string>> = {}): string {
         const _config = HOTP.mergeConfig(config);
 
         return HOTP._toString(_config, 'hotp') +
@@ -170,7 +111,7 @@ export default abstract class HOTP {
      * @param height
      */
     public static toQRCodeURL (
-        config: Partial<HOTPConfig> = {},
+        config: Partial<HOTP.Config<Secret | string>> = {},
         width = 256,
         height = 256
     ): string {
@@ -185,23 +126,22 @@ export default abstract class HOTP {
      * @protected
      * @ignore
      */
-    protected static mergeConfig (config: Partial<HOTPConfig>): HOTPConfigFinal {
+    protected static mergeConfig<In extends HOTP.Config<Secret | string>, Out extends HOTP.Config<Secret>> (
+        config: Partial<In>
+    ): Out {
         config.issuer ??= '';
         config.label ??= 'HOTP Authenticator';
-        config.algorithm ??= DigestAlgorithm.SHA1;
+        config.algorithm ??= HOTP.DigestAlgorithm.SHA1;
         config.digits ??= 6;
         config.counter ??= 0;
         config.window ??= 1;
+        config.secret ??= new Secret();
 
-        const _config: HOTPConfigFinal = config as any;
-
-        if (config.secret instanceof Secret) {
-            _config._secret = config.secret;
-        } else {
-            _config._secret = new Secret(config.secret);
+        if (!(config.secret instanceof Secret)) {
+            config.secret = new Secret(config.secret);
         }
 
-        return _config;
+        return config as any as Out;
     }
 
     /**
@@ -213,7 +153,7 @@ export default abstract class HOTP {
      * @protected
      */
     protected static _toString (
-        config: HOTPConfig,
+        config: HOTP.Config<Secret>,
         type: 'totp' | 'hotp',
         period?: number
     ): string {
@@ -268,7 +208,7 @@ export default abstract class HOTP {
      * @private
      */
     private static digest (
-        algorithm: DigestAlgorithm,
+        algorithm: HOTP.DigestAlgorithm,
         key: Buffer,
         payload: Buffer
     ): Buffer {
@@ -277,3 +217,61 @@ export default abstract class HOTP {
             .digest();
     }
 }
+
+export namespace HOTP {
+    export enum DigestAlgorithm {
+        SHA1 = 'sha1',
+        SHA224 = 'sha224',
+        SHA256 = 'sha256',
+        SHA384 = 'sha384',
+        SHA512 = 'sha512'
+    }
+
+    export type Config<SecretType extends Secret | string> = {
+        /**
+         * Displays as the "issuer" in most Authenticator applications
+         * @default <empty>
+         */
+        issuer: string;
+        /**
+         * Displays as the account label in most Authenticator applications
+         * @default 'Change Me'
+         */
+        label: string;
+        /**
+         * The algorithm to use for digest generation.
+         *
+         * Note: Most authenticator applications have limited support for anything other than SHA1
+         *
+         * @default SHA1
+         */
+        algorithm: DigestAlgorithm,
+        /**
+         * The number of digits to use for the OTP
+         * @default 6
+         */
+        digits: 6 | 8;
+        /**
+         * The HOTP counter
+         *
+         * Note: This should be incremented upon each use to prevent replay attacks. user **must** also increment.
+         *
+         * Note: This value is overwritten when TOTP is used.
+         * @default 0
+         */
+        counter: number;
+        /**
+         * The window of permitted OTP codes when verifying. A value of `1` would allow an OTP that is valid for
+         * the current counter/period +/- 1. A value of `2` would allow +/- 2.
+         * @default 1
+         */
+        window: number;
+        /**
+         * The Secret seed for the generation/validation of the OTP
+         * @default <random>
+         */
+        secret: SecretType;
+    }
+}
+
+export default HOTP;

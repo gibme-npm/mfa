@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2023, Brandon Lehmann <brandonlehmann@gmail.com>
+// Copyright (c) 2019-2025, Brandon Lehmann <brandonlehmann@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,104 +22,7 @@ import fetch from '@gibme/fetch';
 import { createHmac } from 'crypto';
 import { v4 } from 'uuid';
 
-export interface YubiKeySigningParametersOptional {
-    timestamp?: string;
-    sl?: string;
-    timeout?: number;
-}
-
-export interface YubiKeySigningParameters extends YubiKeySigningParametersOptional {
-    /**
-     * The Yubico API client ID
-     */
-    id: string | number;
-    /**
-     * The OTP code
-     */
-    otp: string;
-    /**
-     * A nonce value to prevent replay attachs
-     * @default <random>
-     */
-    nonce: string;
-
-    [key: string]: any;
-}
-
-export interface YubiKeyConfig {
-    /**
-     * The Yubico API client ID
-     */
-    clientId: number | string;
-    /**
-     * The Yubico API key
-     */
-    apiKey: string;
-    /**
-     * The Yubico OTP validation server url
-     * @default https://api.yubico.com/wsapi/2.0/verify
-     */
-    serviceUrl?: string;
-    signingParameters?: YubiKeySigningParametersOptional;
-}
-
-export enum YubiKeyValidationStatus {
-    OK = 'OK',
-    BAD_OTP = 'BAD_OTP',
-    REPLAYED_OTP = 'REPLAYED_OTP',
-    BAD_SIGNATURE = 'BAD_SIGNATURE',
-    MISSING_PARAMETER = 'MISSING_PARAMETER',
-    NO_SUCH_CLIENT = 'NO_SUCH_CLIENT',
-    OPERATION_NOT_ALLOWED = 'OPERATION_NOT_ALLOWED',
-    BACKEND_ERROR = 'BACKEND_ERROR',
-    NOT_ENOUGH_ANSWERS = 'NOT_ENOUGH_ANSWERS',
-    REPLAYED_REQUEST = 'REPLAYED_REQUEST'
-}
-
-export interface YubiKeyValidationResponse {
-    /**
-     * The validation signature
-     */
-    h: string;
-    /**
-     * The response timestamp
-     */
-    t: Date;
-    /**
-     * The OTP code
-     */
-    otp: string;
-    /**
-     * The server nonce to prevent replay attacks
-     */
-    nonce: string;
-    sl?: number;
-    /**
-     * The status of the request
-     */
-    status: YubiKeyValidationStatus;
-}
-
-export interface YubiKeyValidationResult extends YubiKeyValidationResponse {
-    /**
-     * Whether the OTP presented is valid (okay)
-     */
-    isOk: boolean;
-    /**
-     * The YubiKey device ID that presented the OTP
-     */
-    deviceId: string;
-    /**
-     * Whether the response signature from the server is valid
-     */
-    signatureValid: boolean;
-    /**
-     * Set to `true` if both the OTP presented and the server response signature are valid
-     */
-    valid: boolean;
-}
-
-export default abstract class YubiKeyOTP {
+export abstract class YubiKeyOTP {
     /**
      * Verifies a YubiKey OTP code
      *
@@ -129,9 +32,9 @@ export default abstract class YubiKeyOTP {
      */
     public static async verify (
         otp: string | number,
-        config: YubiKeyConfig,
+        config: YubiKeyOTP.Config,
         timeout = 5000
-    ): Promise<YubiKeyValidationResult> {
+    ): Promise<YubiKeyOTP.ValidationResult> {
         if (typeof otp === 'number') {
             otp = otp.toString();
         }
@@ -140,7 +43,7 @@ export default abstract class YubiKeyOTP {
 
         const nonce = v4().replace(/-/g, '');
 
-        const params: YubiKeySigningParameters = {
+        const params: YubiKeyOTP.SigningParameters = {
             ...config.signingParameters,
             id: config.clientId,
             nonce,
@@ -167,10 +70,10 @@ export default abstract class YubiKeyOTP {
 
         return {
             ...result,
+            isOk: result.status === YubiKeyOTP.ValidationStatus.OK,
             deviceId: otp.substring(0, 12),
             signatureValid: _signature === result.h,
-            isOk: result.status === YubiKeyValidationStatus.OK,
-            valid: result.status === YubiKeyValidationStatus.OK && _signature === result.h
+            valid: result.status === YubiKeyOTP.ValidationStatus.OK && _signature === result.h
         };
     }
 
@@ -224,7 +127,7 @@ export default abstract class YubiKeyOTP {
     private static async validate (
         url: string,
         timeout = 5000
-    ): Promise<YubiKeyValidationResponse> {
+    ): Promise<YubiKeyOTP.ValidationResponse> {
         const response = await fetch(url, {
             timeout
         });
@@ -250,3 +153,101 @@ export default abstract class YubiKeyOTP {
         return result;
     }
 }
+
+export namespace YubiKeyOTP {
+    export type SigningParameters = {
+        timestamp?: string;
+        sl?: string;
+        timeout?: number;
+        /**
+         * The Yubico API client ID
+         */
+        id: string | number;
+        /**
+         * The OTP code
+         */
+        otp: string;
+        /**
+         * A nonce value to prevent replay attachs
+         * @default <random>
+         */
+        nonce: string;
+
+        [key: string]: any;
+    }
+
+    export type Config = {
+        /**
+         * The Yubico API client ID
+         */
+        clientId: number | string;
+        /**
+         * The Yubico API key
+         */
+        apiKey: string;
+        /**
+         * The Yubico OTP validation server url
+         * @default https://api.yubico.com/wsapi/2.0/verify
+         */
+        serviceUrl?: string;
+        signingParameters?: SigningParameters;
+    }
+
+    export enum ValidationStatus {
+        OK = 'OK',
+        BAD_OTP = 'BAD_OTP',
+        REPLAYED_OTP = 'REPLAYED_OTP',
+        BAD_SIGNATURE = 'BAD_SIGNATURE',
+        MISSING_PARAMETER = 'MISSING_PARAMETER',
+        NO_SUCH_CLIENT = 'NO_SUCH_CLIENT',
+        OPERATION_NOT_ALLOWED = 'OPERATION_NOT_ALLOWED',
+        BACKEND_ERROR = 'BACKEND_ERROR',
+        NOT_ENOUGH_ANSWERS = 'NOT_ENOUGH_ANSWERS',
+        REPLAYED_REQUEST = 'REPLAYED_REQUEST'
+    }
+
+    export type ValidationResponse = {
+        /**
+         * The validation signature
+         */
+        h: string;
+        /**
+         * The response timestamp
+         */
+        t: Date;
+        /**
+         * The OTP code
+         */
+        otp: string;
+        /**
+         * The server nonce to prevent replay attacks
+         */
+        nonce: string;
+        sl?: number;
+        /**
+         * The status of the request
+         */
+        status: ValidationStatus;
+    }
+
+    export type ValidationResult = ValidationResponse & {
+        /**
+         * Whether the OTP presented is valid (okay)
+         */
+        isOk: boolean;
+        /**
+         * The YubiKey device ID that presented the OTP
+         */
+        deviceId: string;
+        /**
+         * Whether the response signature from the server is valid
+         */
+        signatureValid: boolean;
+        /**
+         * Set to `true` if both the OTP presented and the server response signature are valid
+         */
+        valid: boolean;
+    }
+}
+
+export default YubiKeyOTP;

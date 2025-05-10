@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2023, Brandon Lehmann <brandonlehmann@gmail.com>
+// Copyright (c) 2019-2025, Brandon Lehmann <brandonlehmann@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,23 +21,7 @@
 import { randomBytes } from 'crypto';
 import Base32 from '@gibme/base32';
 
-export type BufferEncodingLike = BufferEncoding | 'base32';
-
-export interface SecretOptions {
-    /**
-     * The secret seed
-     *
-     * If a string is supplied, `secretEncoding` is used to load the secret
-     */
-    secret: string | Buffer;
-    /**
-     * The byte size of the seed
-     * @default 20
-     */
-    size: number;
-}
-
-export default class Secret {
+export class Secret {
     public readonly buffer: Buffer;
 
     /**
@@ -45,17 +29,17 @@ export default class Secret {
      *
      * @param configOrSeed if a string, base32 decoding will be used
      */
-    constructor (configOrSeed: Partial<SecretOptions> | string = {}) {
+    constructor (configOrSeed: Partial<Secret.Options> | string = {}) {
         if (typeof configOrSeed === 'string') {
-            configOrSeed = { secret: configOrSeed } as SecretOptions;
+            configOrSeed = { secret: configOrSeed } as Partial<Secret.Options>;
         }
 
         configOrSeed.size ??= 20;
 
-        if (configOrSeed.secret instanceof Buffer) {
-            this.buffer = configOrSeed.secret;
-        } else if (configOrSeed.secret) {
+        if (typeof configOrSeed.secret === 'string') {
             this.buffer = Base32.decode(configOrSeed.secret.replace(/ /g, ''));
+        } else if (configOrSeed.secret) {
+            this.buffer = configOrSeed.secret;
         } else {
             this.buffer = randomBytes(configOrSeed.size);
         }
@@ -66,7 +50,7 @@ export default class Secret {
      *
      * @param encoding
      */
-    public toString (encoding: BufferEncodingLike = 'base32'): string {
+    public toString (encoding: BufferEncoding | 'base32' = 'base32'): string {
         if (encoding === 'base32') {
             return Base32.encode(this.buffer, false);
         }
@@ -74,3 +58,21 @@ export default class Secret {
         return this.buffer.toString(encoding);
     }
 }
+
+export namespace Secret {
+    export type Options = {
+        /**
+         * The secret seed
+         *
+         * If a string is supplied, `secretEncoding` is used to load the secret
+         */
+        secret: string | Buffer;
+        /**
+         * The byte size of the seed
+         * @default 20
+         */
+        size: number;
+    }
+}
+
+export default Secret;

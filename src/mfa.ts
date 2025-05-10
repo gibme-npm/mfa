@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2023, Brandon Lehmann <brandonlehmann@gmail.com>
+// Copyright (c) 2019-2025, Brandon Lehmann <brandonlehmann@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,32 +18,21 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-import YubiKeyOTP, {
-    YubiKeyConfig,
-    YubiKeyValidationResponse,
-    YubiKeySigningParameters,
-    YubiKeySigningParametersOptional,
-    YubiKeyValidationResult,
-    YubiKeyValidationStatus
-} from './yubi-key-otp';
-import TOTP, { TOTPConfig } from './totp';
-import HOTP, { DigestAlgorithm, HOTPConfig } from './hotp';
-import Secret, { SecretOptions, BufferEncodingLike } from './secret';
+import YubiKeyOTP from './yubi-key-otp';
+import TOTP from './totp';
+import HOTP from './hotp';
+import Secret from './secret';
 
 export {
     YubiKeyOTP,
-    YubiKeyConfig,
-    YubiKeyValidationResponse,
-    YubiKeySigningParameters,
-    YubiKeySigningParametersOptional,
-    YubiKeyValidationResult,
-    YubiKeyValidationStatus,
     TOTP,
-    TOTPConfig,
     HOTP,
-    HOTPConfig,
-    DigestAlgorithm,
-    Secret,
-    SecretOptions,
-    BufferEncodingLike
+    Secret
+};
+
+export default {
+    YubiKeyOTP,
+    TOTP,
+    HOTP,
+    Secret
 };
