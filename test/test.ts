@@ -1,4 +1,4 @@
-// Copyright (c) 2019-2023, Brandon Lehmann <brandonlehmann@gmail.com>
+// Copyright (c) 2019-2025, Brandon Lehmann <brandonlehmann@gmail.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -27,6 +27,28 @@ dotenv.config();
 
 const sleep = async (timeout: number) => new Promise(resolve => setTimeout(resolve, timeout));
 
+describe('Secret Tests', () => {
+    const secret = new Secret();
+
+    it('Generate', () => {
+        const new_secret = new Secret();
+
+        assert.notDeepEqual(new_secret.toString(), secret.toString());
+    });
+
+    it('Generate [From Seed]', () => {
+        const new_secret = new Secret({ secret: secret.toString() });
+
+        assert.deepEqual(new_secret.toString(), secret.toString());
+    });
+
+    it('Generate [From Seed String]', () => {
+        const new_secret = new Secret(secret.toString());
+
+        assert.deepEqual(new_secret.toString(), secret.toString());
+    });
+});
+
 describe('TOTP Tests', () => {
     const secret = new Secret();
 
@@ -53,6 +75,22 @@ describe('TOTP Tests', () => {
 
         assert.deepEqual(false, success);
     });
+
+    it('Verify toString()', () => {
+        const str = TOTP.toString({ secret });
+
+        console.log(str);
+
+        assert.notEqual(str.length, 0);
+    });
+
+    it('Verify QR Code URL', () => {
+        const str = TOTP.toQRCodeURL({ secret });
+
+        console.log(str);
+
+        assert.notEqual(str.length, 0);
+    });
 });
 
 describe('HOTP Tests', () => {
@@ -78,6 +116,22 @@ describe('HOTP Tests', () => {
         const [success] = HOTP.verify(token, { secret, counter: 2 });
 
         assert.deepEqual(false, success);
+    });
+
+    it('Verify toString()', () => {
+        const str = HOTP.toString({ secret });
+
+        console.log(str);
+
+        assert.notEqual(str.length, 0);
+    });
+
+    it('Verify QR Code URL', () => {
+        const str = HOTP.toQRCodeURL({ secret });
+
+        console.log(str);
+
+        assert.notEqual(str.length, 0);
     });
 });
 
