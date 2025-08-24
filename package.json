@@ -1,6 +1,6 @@
 {
   "name": "@gibme/mfa",
-  "version": "2.0.1",
+  "version": "20.0.0",
   "description": "A simple mfa helper",
   "main": "dist/mfa.js",
   "types": "dist/mfa.d.ts",
@@ -53,7 +53,7 @@
   },
   "homepage": "https://gibme-npm.github.io/mfa/",
   "engines": {
-    "node": ">=18"
+    "node": ">=20"
   },
   "engineStrict": true,
   "author": {
@@ -61,26 +61,26 @@
     "email": "brandonlehmann@gmail.com"
   },
   "devDependencies": {
-    "@types/mocha": "^10.0.6",
-    "@types/node": "^22.15.17",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "^24.3.0",
     "@typescript-eslint/eslint-plugin": "^6.19.1",
     "@typescript-eslint/parser": "^6.19.1",
-    "dotenv": "^16.5.0",
+    "dotenv": "^17.2.1",
     "eslint": "^8.56.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-import": "^2.29.1",
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-promise": "^6.1.1",
-    "mocha": "^10.2.0",
+    "mocha": "^11.7.1",
     "ts-node": "^10.9.2",
     "typedoc": "^0.28.4",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@gibme/base32": "^1.0.14",
-    "@gibme/bytepack": "^1.0.17",
-    "@gibme/fetch": "^2.0.0",
+    "@gibme/base32": "^20.0.0",
+    "@gibme/bytepack": "^20.0.0",
+    "@gibme/fetch": "^20.0.0",
     "uuid": "^11.1.0"
   }
 }
