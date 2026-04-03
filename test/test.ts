@@ -19,7 +19,7 @@
 // SOFTWARE.
 
 import assert from 'assert';
-import { it, describe } from 'mocha';
+import { it, describe } from 'node:test';
 import { Secret, TOTP, HOTP, YubiKeyOTP } from '../src/mfa';
 import * as dotenv from 'dotenv';
 
@@ -140,9 +140,9 @@ describe('YubiKey Tests', () => {
     const clientId = process.env.CLIENT_ID || '0';
     const apiKey = process.env.API_KEY || '';
 
-    it('Verify', async function () {
+    it('Verify', { skip: false }, async (t) => {
         if (clientId === '0' || apiKey.length === 0) {
-            return this.skip();
+            return t.skip('CLIENT_ID and API_KEY not configured');
         }
 
         const response = await YubiKeyOTP.verify(otp, {
